@@ -1,0 +1,95 @@
+@import "utils";
+
+/* Default (Light Mode) */
+:root {
+  --background: 0, 0%, 100%;
+  --foreground: 240, 10%, 3.9%;
+  --card: 0, 0%, 100%;
+  --card-foreground: 240, 10%, 3.9%;
+  --popover: 0, 0%, 100%;
+  --popover-foreground: 240, 10%, 3.9%;
+  --primary: 240, 5.9%, 10%;
+  --primary-foreground: 0, 0%, 98%;
+  --secondary: 240, 4.8%, 95.9%;
+  --secondary-foreground: 240, 5.9%, 10%;
+  --muted: 240, 4.8%, 95.9%;
+  --muted-foreground: 240, 3.8%, 46.1%;
+  --accent: 240, 4.8%, 95.9%;
+  --accent-foreground: 240, 5.9%, 10%;
+  --destructive: 0, 84.2%, 60.2%;
+  --destructive-foreground: 0, 0%, 98%;
+  --border: 240, 5.9%, 90%;
+  --input: 240, 5.9%, 90%;
+  --ring: 240, 10%, 3.9%;
+  --radius: 0.5rem;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 240 13% 14%;
+    --foreground: 51 33% 80%;
+    --muted: 240 12% 18%;
+    --muted-foreground: 240 12% 68%;
+    --popover: 240 13% 11%;
+    --popover-foreground: 51 33% 90%;
+    --card: 240 13% 12%;
+    --card-foreground: 51 33% 85%;
+    --border: 240 3% 19%;
+    --input: 240 3% 22%;
+    --primary: 51 33% 80%;
+    --primary-foreground: 51 33% 20%;
+    --secondary: 51 23% 25%;
+    --secondary-foreground: 51 23% 85%;
+    --accent: 240 13% 29%;
+    --accent-foreground: 240 13% 89%;
+    --destructive: 1 86% 57%;
+    --destructive-foreground: 0 0% 100%;
+    --ring: 51 33% 80%;
+  }
+}
+
+// Reset styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  @include font-nunito(500);
+}
+
+/***   Scrollbar    ***/
+/* Scrollbar color and width for Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--ring)) transparent;
+}
+
+/* Overall scrollbar styling */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+/* Track (background of the scrollbar) */
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+/* Handle (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--ring));
+  border-radius: 10px;
+  /* border: 3px solid #f1f1f1; */
+}
+
+/* Remove top and bottom (or left and right) arrow buttons */
+::-webkit-scrollbar-button {
+  display: none;
+}

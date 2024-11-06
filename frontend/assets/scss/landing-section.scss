@@ -1,0 +1,41 @@
+@import "utils";
+
+.landing-section {
+  margin-bottom: 3rem;
+
+  .landing-heading {
+    padding: 0 1.25rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title {
+      @include font-roboto(700);
+      text-transform: capitalize;
+      font-size: 1.75rem;
+    }
+
+    .link {
+      text-decoration: none;
+      color: hsl(var(--foreground));
+      font-size: 0.85rem;
+      opacity: 0.7;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+
+  60% {
+    opacity: 1;
+  }
+}

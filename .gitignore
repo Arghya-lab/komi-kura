@@ -26,3 +26,8 @@ lerna-debug.log*
 
 # misc
 .DS_Store
+
+#auto gen
+public/styles
+public/scripts
+public/static

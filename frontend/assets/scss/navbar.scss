@@ -1,0 +1,123 @@
+@import "utils";
+
+$navbar-padding-x: 1rem;
+$navbar-padding-y: 0.75rem;
+$navbar-logo-width: 92px;
+$navbar-logo-width-big: 144px;
+$navbar-logo-gap: 1rem;
+
+.navbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $navbar-padding-y $navbar-padding-y;
+
+  .navbar-heading {
+    position: absolute;
+    left: 1rem;
+    top: $navbar-padding-y;
+    bottom: $navbar-padding-y;
+    width: $navbar-logo-width;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: hsl(var(--primary));
+    @include font-roboto(500);
+
+    @media (min-width: 576px) {
+      width: $navbar-logo-width-big;
+    }
+  }
+
+  .search-form {
+    display: flex;
+    margin-left: calc($navbar-logo-width + $navbar-logo-gap);
+    height: 2.25rem;
+    width: 100%;
+    max-width: 48rem;
+    align-items: center;
+    border-radius: 45px;
+    border: 1px solid hsl(var(--border));
+    background-color: hsla(var(--foreground), 0.05);
+    box-shadow: 0 1px 2px hsla(var(--foreground), 0.1);
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: hsla(var(--foreground), 0.1);
+    }
+
+    @media (min-width: 576px) {
+      height: 3rem;
+      margin-left: calc($navbar-logo-width-big + $navbar-logo-gap);
+    }
+
+    @media (min-width: 768px) {
+      width: 66.66%;
+    }
+
+    .search-input {
+      height: 100%;
+      width: calc(100% - 24px - 24px - 2.5rem);
+      background-color: transparent;
+      padding-left: 1.75rem;
+      font-weight: 500;
+      border: none;
+      outline: none;
+      color: hsl(var(--foreground));
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .clear-icon {
+      height: 1.5rem;
+      width: 1.5rem;
+      flex: 1;
+      padding-left: 0.25rem;
+      padding-right: 0.5rem;
+    }
+
+    .search-button {
+      height: 1.5rem;
+      width: 1.5rem;
+      flex: 1;
+      padding-left: 0.5rem;
+      padding-right: 1rem;
+      background-color: transparent;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: opacity 0.3s;
+
+      .search-icon {
+        color: hsl(var(--foreground));
+        opacity: 0.55;
+        transition: opacity 0.3s;
+
+        &:hover {
+          opacity: 0.75;
+        }
+      }
+    }
+  }
+}
+
+// // Responsive navbar for smaller screens
+// @media (max-width: 600px) {
+//   .navbar {
+//     ul {
+//       flex-direction: column;
+//       align-items: center;
+
+//       a {
+//         display: block;
+//         width: 100%;
+//         text-align: center;
+//       }
+//     }
+//   }
+// }

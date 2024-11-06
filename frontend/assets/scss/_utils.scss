@@ -1,0 +1,11 @@
+@mixin font-roboto($weight) {
+  font-family: "Roboto", sans-serif;
+  font-weight: $weight;
+}
+
+@mixin font-nunito($weight) {
+  font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: $weight;
+  font-style: normal;
+}

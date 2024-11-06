@@ -2,14 +2,29 @@
   "name": "komi-kura",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.tsx"
+    "dev:backend": "tsx watch backend/index.ts",
+    "dev:frontend": "vite build --watch",
+    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\""
   },
   "dependencies": {
+    "@consumet/extensions": "github:consumet/consumet.ts",
     "@hono/node-server": "^1.13.5",
-    "hono": "^4.6.9"
+    "@tabler/icons-react": "^3.21.0",
+    "axios": "^1.7.7",
+    "cheerio": "^1.0.0",
+    "hono": "^4.6.9",
+    "hono-rate-limiter": "^0.4.0",
+    "locomotive-scroll": "^4.1.4",
+    "pretty-print-json": "^3.0.3",
+    "swiper": "^11.1.14"
   },
   "devDependencies": {
+    "@types/locomotive-scroll": "^4.1.3",
     "@types/node": "^20.11.17",
-    "tsx": "^4.7.1"
+    "concurrently": "^9.1.0",
+    "sass": "^1.80.6",
+    "tsx": "^4.7.1",
+    "vite": "^5.4.10",
+    "vite-plugin-static-copy": "^2.0.0"
   }
 }
