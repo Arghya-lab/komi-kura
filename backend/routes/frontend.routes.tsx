@@ -4,6 +4,7 @@ import InfoPage from "../../frontend/pages/info.page.js";
 import TrendingPage from "../../frontend/pages/trending.page.js";
 import PopularPage from "../../frontend/pages/popular.page.js";
 import TopPage from "../../frontend/pages/top.page.js";
+import ReadPage from "../../frontend/pages/Read.page.js";
 
 const frontendRoute = new Hono();
 
@@ -29,6 +30,10 @@ frontendRoute.get("/top", (c) => {
 
 frontendRoute.get("/info/:mangaId", (c) => {
   return c.html(<InfoPage mangaId={c.req.param().mangaId} />);
+});
+
+frontendRoute.get("/read/:chapterId", (c) => {
+  return c.html(<ReadPage chapterId={c.req.param().chapterId} />);
 });
 
 export default frontendRoute;

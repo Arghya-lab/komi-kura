@@ -1,0 +1,30 @@
+.overview {
+  background: hsl(var(--card));
+  border-radius: var(--radius);
+  padding: 20px;
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    padding: 30px;
+  }
+  @media (min-width: 1280px) {
+    padding: 36px calc((100vw - 1280px + 60px) / 2);
+  }
+
+  .heading {
+    text-transform: capitalize;
+    margin: 0;
+    padding: 0;
+    color: hsl(var(--primary));
+    font-size: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  div {
+    .info-title {
+      text-transform: capitalize;
+      color: hsl(var(--primary));
+      font-size: 1.125rem;
+      padding-bottom: 12px;
+    }
+  }
+}

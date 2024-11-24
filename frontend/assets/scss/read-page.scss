@@ -1,0 +1,18 @@
+.page-container {
+  height: calc(100vh - 2.25rem - 1.5rem);
+  overflow-y: scroll;
+
+  @media (min-width: 576px) {
+    height: calc(100vh - 3rem - 1.5rem);
+  }
+
+  .page {
+    max-width: 800px;
+    margin: auto;
+    padding-bottom: 20px;
+
+    .page-image {
+      width: 100%;
+    }
+  }
+}

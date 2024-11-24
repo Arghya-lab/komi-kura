@@ -4,7 +4,10 @@
   "scripts": {
     "dev:backend": "tsx watch backend/index.ts",
     "dev:frontend": "vite build --watch",
-    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\""
+    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\"",
+    "start:backend": "tsx backend/index.ts",
+    "start:frontend": "vite build",
+    "start": "concurrently \"pnpm run start:backend\" \"pnpm run start:frontend\""
   },
   "dependencies": {
     "@consumet/extensions": "github:consumet/consumet.ts",
@@ -12,14 +15,14 @@
     "@tabler/icons-react": "^3.21.0",
     "axios": "^1.7.7",
     "cheerio": "^1.0.0",
+    "classnames": "^2.5.1",
+    "dompurify": "^3.2.1",
     "hono": "^4.6.9",
     "hono-rate-limiter": "^0.4.0",
-    "locomotive-scroll": "^4.1.4",
-    "pretty-print-json": "^3.0.3",
-    "swiper": "^11.1.14"
+    "jsdom": "^25.0.1"
   },
   "devDependencies": {
-    "@types/locomotive-scroll": "^4.1.3",
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^20.11.17",
     "concurrently": "^9.1.0",
     "sass": "^1.80.6",

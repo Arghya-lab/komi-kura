@@ -8,7 +8,7 @@ function PosterGrid({ mangaList }: { mangaList: IMiniMangaItem[] }) {
         {mangaList.map((manga) => (
           <a href={`/info/${manga.id}`} class="media-card">
             <div class="cover">
-              <div class="image-background"></div>
+              <div class="image-background" />
               <img src={manga.coverImage} class="image" />
             </div>
             <p class="title">{manga.title}</p>
