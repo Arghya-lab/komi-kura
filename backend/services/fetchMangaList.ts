@@ -138,15 +138,15 @@ export default async function fetchMangaList(type: ILandingMangaCategory) {
 
     $(".results.cover > .media-card").each((index, element) => {
       const link = $(element).find("a.cover").attr("href") || "";
-      const title = $(element).find("a.title").text().trim();
-      const coverImage = $(element).find("a.cover > img").attr("src");
+      const name = $(element).find("a.title").text().trim();
+      const imgSrc = $(element).find("a.cover > img").attr("src");
 
       const match = link.match(/\/manga\/(\d+)\//);
-      if (match && title && coverImage) {
+      if (match && name && imgSrc) {
         mangaList.push({
           id: match[1],
-          title,
-          coverImage,
+          name,
+          imgSrc,
         });
       }
     });

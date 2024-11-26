@@ -54,11 +54,12 @@ export default defineConfig({
         // preserveModulesRoot: "frontend/assets",
       },
     },
-    minify: false,
+    minify: true,
   },
   css: {
     preprocessorOptions: {
       scss: {
+        api: "modern-compiler",
         // additionalData: `@import "frontend/assets/scss/variables.scss";`,
       },
     },

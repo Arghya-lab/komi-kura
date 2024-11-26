@@ -1,4 +1,7 @@
-import type { IMangaChapterPage } from "@consumet/extensions";
+interface IMangaChapterPage {
+  page: number;
+  img: string;
+}
 
 declare global {
   interface Window {
@@ -6,73 +9,135 @@ declare global {
   }
 }
 
-const pageContainer = document.querySelector(".page-container");
+const pages: IMangaChapterPage[] = window.pages || [];
+const imageContainer = document.getElementById("page-container")!;
+let loadedImages = new Set<number>();
+let isLoading = false; // Track the loading state
+let loadingQueue: number[] = []; // Queue to track images to load
 
-function loadImagesSequentially() {
-  if (!window.pages || !pageContainer) return;
+const loadImage = async (url: string, pageNo: number): Promise<void> => {
+  return new Promise((resolve) => {
+    const wrapper = document.querySelector(
+      `.page-wrapper[data-page-no="${pageNo}"]`
+    ) as HTMLDivElement | null;
+    if (!wrapper) return;
 
-  let currentIndex = 0;
-  let isImageLoading = false;
+    // Check if an image already exists
+    if (wrapper.querySelector("img")) {
+      resolve(); // If an image exists, skip loading
+      return;
+    }
 
-  const observerOptions: IntersectionObserverInit = {
-    root: null, // Use viewport as the root
-    rootMargin: "0px 0px 300px 0px", // Preload 300px before viewport
-    threshold: 0, // Trigger as soon as element enters viewport
-  };
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting && !isImageLoading) {
-        // Explicitly cast entry.target to HTMLDivElement
-        const target = entry.target as HTMLDivElement;
-
-        if (currentIndex === parseInt(target.dataset.index || "0")) {
-          loadNextImage(target);
-          observer.unobserve(entry.target); // Stop observing after processing
-        }
-      }
-    });
-  }, observerOptions);
-
-  function loadNextImage(target: HTMLDivElement) {
-    const img = target.querySelector("img") as HTMLImageElement;
-    const dataSrc = img.dataset.src;
-
-    if (!dataSrc) return;
-
-    isImageLoading = true; // Mark loading in progress
+    const img = new Image();
+    img.src = url;
 
     img.onload = () => {
-      console.log(`Image ${currentIndex + 1} loaded`);
-      isImageLoading = false; // Mark loading complete
-      currentIndex++; // Increment to the next image
+      wrapper.classList.remove("loading");
+      img.style.display = "block";
+
+      // Ensure no duplicate images are appended
+      if (!wrapper.querySelector("img")) {
+        wrapper.appendChild(img);
+      }
+      resolve();
     };
 
     img.onerror = () => {
-      console.error(`Failed to load image: ${dataSrc}`);
-      isImageLoading = false; // Allow next image loading even if an error occurs
-      currentIndex++;
+      wrapper.classList.remove("loading");
+      wrapper.classList.add("loading-failed");
+      if (!wrapper.textContent?.includes("Failed to load")) {
+        const failedText = document.createElement("p");
+        failedText.innerText = "Failed to load";
+        !wrapper.appendChild(failedText);
+      }
+      resolve();
     };
+  });
+};
 
-    img.src = dataSrc; // Trigger image load
+const createWrapper = (pageNo: number) => {
+  const wrapper = document.createElement("div");
+  wrapper.className = "page-wrapper loading";
+  wrapper.setAttribute("data-page-no", pageNo.toString());
+
+  const number = document.createElement("div");
+  number.className = "page-number";
+  number.textContent = `#${pageNo}`;
+  wrapper.appendChild(number);
+
+  imageContainer.appendChild(wrapper);
+};
+
+const observeImages = (pages: IMangaChapterPage[]) => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const pageNo = parseInt(entry.target.getAttribute("data-page-no")!, 10);
+
+        if (entry.isIntersecting) {
+          // If in viewport and not loaded, add to the loading queue
+          if (!loadedImages.has(pageNo) && !loadingQueue.includes(pageNo)) {
+            // loadingQueue.push(pageNo);
+            loadingQueue = [pageNo];
+
+            const prevPage = loadingQueue[0] - 1;
+            if (
+              loadingQueue.length > 0 &&
+              loadingQueue[0] > 1 &&
+              !loadingQueue.includes(prevPage)
+            ) {
+              loadingQueue.unshift(prevPage); // Add previous page at the beginning
+            }
+
+            if (loadingQueue.length <= 2) {
+              const lastLoadable = loadingQueue[loadingQueue.length - 1];
+              loadingQueue.push(lastLoadable + 1, lastLoadable + 2);
+            }
+            loadingQueue = loadingQueue.filter(
+              (pageNo) => !loadedImages.has(pageNo)
+            );
+          }
+        } else {
+          // If out of viewport and not loaded, remove from the queue
+          loadingQueue = loadingQueue.filter((i) => i !== pageNo);
+        }
+      });
+
+      // Load the next image if not already loading
+      if (loadingQueue.length > 0) {
+        loadNextImage(pages.map((page) => page.img));
+      }
+    },
+    { root: null, threshold: 0.1 }
+  );
+
+  // Observe all image wrappers
+  document
+    .querySelectorAll(".page-wrapper")
+    .forEach((wrapper) => observer.observe(wrapper));
+};
+
+const loadNextImage = (urls: string[]) => {
+  if (loadingQueue.length === 0) return;
+  if (isLoading) return;
+
+  isLoading = true;
+  const nextPage = loadingQueue.shift()!;
+
+  if (!nextPage || nextPage < 1 || nextPage > pages.length) {
+    isLoading = false;
+    return;
   }
 
-  // Add all page elements and start observing
-  window.pages.forEach((pageData, index) => {
-    const page = document.createElement("div");
-    page.className = "page";
-    page.dataset.index = index.toString(); // Add index for sequential control
-
-    const img = document.createElement("img");
-    img.dataset.src = pageData.img; // Lazy load the src
-    img.alt = `Page ${pageData.page}`;
-    img.className = "page-image";
-
-    page.appendChild(img);
-    pageContainer.appendChild(page);
-
-    observer.observe(page); // Start observing this page
+  loadImage(urls[nextPage - 1], nextPage).then(() => {
+    isLoading = false;
+    loadNextImage(urls);
   });
-}
+};
 
-loadImagesSequentially();
+const init = () => {
+  pages.forEach((page) => createWrapper(page.page));
+  observeImages(pages);
+};
+
+init();

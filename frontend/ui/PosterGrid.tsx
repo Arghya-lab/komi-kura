@@ -1,18 +1,19 @@
 import type { IMiniMangaItem } from "../../@types/manga.js";
+import convertTitleToString from "../../lib/convertTitleToString.js";
+import MangaPoster from "./MangaPoster.js";
 
 function PosterGrid({ mangaList }: { mangaList: IMiniMangaItem[] }) {
   return (
     <>
       <link rel="stylesheet" href="/assets/styles/poster-grid.css" />
+      <link rel="stylesheet" href="/assets/styles/manga-poster.css" />
       <div class="grid-items">
         {mangaList.map((manga) => (
-          <a href={`/info/${manga.id}`} class="media-card">
-            <div class="cover">
-              <div class="image-background" />
-              <img src={manga.coverImage} class="image" />
-            </div>
-            <p class="title">{manga.title}</p>
-          </a>
+          <MangaPoster
+            id={manga.id}
+            name={convertTitleToString(manga.name)}
+            imgSrc={manga.imgSrc || ""}
+          />
         ))}
       </div>
     </>

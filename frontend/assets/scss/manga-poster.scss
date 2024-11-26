@@ -1,0 +1,98 @@
+.poster-container {
+  color: hsl(var(--foreground));
+  text-decoration: none;
+  padding: 8px 8px 0;
+  border-radius: 5px;
+
+  &:hover {
+    background: hsl(var(--muted));
+    color: hsl(var(--foreground) / 0.9);
+
+    .cover {
+      border-radius: var(--radius);
+
+      .image {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  .cover {
+    background-color: hsl(var(--accent));
+    border-radius: 5px;
+    box-shadow: 0 0 16px hsl(var(--accent));
+    display: inline-block;
+    width: 100%;
+    aspect-ratio: 23 / 34;
+    overflow: hidden;
+    position: relative;
+    z-index: 5;
+    color: inherit;
+    text-decoration: none;
+    transition: 0.15s;
+    outline: 0;
+
+    .image-background,
+    .image {
+      height: 100%;
+      left: 0;
+      object-fit: cover;
+      position: absolute;
+      z-index: 5;
+      top: 0;
+      transition: opacity 0.3s ease-in-out;
+      width: 100%;
+      transform: translateZ(0);
+      user-select: none;
+      overflow: hidden;
+      transition: transform 0.2s ease-in;
+    }
+
+    .image-background {
+      background-color: hsl(var(--accent));
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .info-chip-container {
+      position: absolute;
+      z-index: 10;
+      bottom: 10px;
+      left: 10px;
+      font-size: 0.72rem;
+      display: flex;
+      gap: 1px;
+
+      div:first-child {
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+      }
+      div:last-child {
+        border-bottom-right-radius: 4px;
+        border-top-right-radius: 4px;
+      }
+
+      .info-chip {
+        padding: 4px;
+        background-color: hsl(var(--background));
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+    }
+  }
+
+  .content {
+    padding: 16px 8px 0;
+    height: 72px;
+
+    .name {
+      line-height: 1.3;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      text-overflow: ellipsis;
+    }
+  }
+}

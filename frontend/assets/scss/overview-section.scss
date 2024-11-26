@@ -1,3 +1,5 @@
+@import "utils";
+
 .overview {
   background: hsl(var(--card));
   border-radius: var(--radius);
@@ -11,6 +13,7 @@
   }
 
   .heading {
+    @include font-roboto(500);
     text-transform: capitalize;
     margin: 0;
     padding: 0;

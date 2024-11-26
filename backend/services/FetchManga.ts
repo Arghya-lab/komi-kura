@@ -34,7 +34,21 @@ export const getMangaInfo = async (mangaId: string, provider?: string) => {
   }
 };
 
-export const getMangaPages = async (chapterId: string, provider?: string) => {
+export const getMangaPages = async (
+  chapterId: string,
+  provider?:
+    | "MangaDex"
+    | "ComicK"
+    | "MangaHere"
+    | "MangaKakalot"
+    | "Mangasee123"
+    | "Mangapark"
+    | "MangaPill"
+    | "MangaReader"
+    | "FlameScans"
+    | "MangaHost"
+    | "BRMangas"
+) => {
   let anilist = new META.Anilist.Manga();
   if (typeof provider !== "undefined") {
     const possibleProvider = PROVIDERS_LIST.MANGA.find(

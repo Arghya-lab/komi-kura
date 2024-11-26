@@ -66,13 +66,13 @@ function OverviewSection({ mangaInfo }: { mangaInfo: IMangaInfo }) {
             <span> {mangaInfo.status}</span>
           </div>
         )}
-        {mangaInfo.genres?.length && (
+        {mangaInfo.genres && mangaInfo.genres.length > 0 && (
           <div>
             <span class="info-title">genres :</span>
             <span> {mangaInfo.genres.map((genre) => genre).join(", ")}</span>
           </div>
         )}
-        {mangaInfo.authors?.length && (
+        {mangaInfo.authors && mangaInfo.authors.length > 0 && (
           <div>
             <span class="info-title">authors :</span>
             <span> {mangaInfo.authors.map((author) => author).join(", ")}</span>

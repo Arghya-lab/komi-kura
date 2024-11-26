@@ -5,6 +5,7 @@ import TrendingPage from "../../frontend/pages/trending.page.js";
 import PopularPage from "../../frontend/pages/popular.page.js";
 import TopPage from "../../frontend/pages/top.page.js";
 import ReadPage from "../../frontend/pages/Read.page.js";
+import SearchPage from "../../frontend/pages/SearchPage.js";
 
 const frontendRoute = new Hono();
 
@@ -26,6 +27,10 @@ frontendRoute.get("/popular", (c) => {
 
 frontendRoute.get("/top", (c) => {
   return c.render(<TopPage />);
+});
+
+frontendRoute.get("/search/:searchQuery", (c) => {
+  return c.html(<SearchPage searchQuery={c.req.param().searchQuery} />);
 });
 
 frontendRoute.get("/info/:mangaId", (c) => {

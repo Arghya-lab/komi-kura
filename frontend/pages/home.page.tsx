@@ -14,13 +14,13 @@ async function HomePage() {
   return (
     <Layout>
       <Navbar />
-      <LandingSection landingTitle="trending">
+      <LandingSection landingTitle="trending" showViewAll>
         <PosterGrid mangaList={trendingList.slice(0, 8)} />
       </LandingSection>
-      <LandingSection landingTitle="popular">
+      <LandingSection landingTitle="popular" showViewAll>
         <PosterGrid mangaList={popularList.slice(0, 8)} />
       </LandingSection>
-      <LandingSection landingTitle="top">
+      <LandingSection landingTitle="top" showViewAll>
         <PosterGrid mangaList={topList.slice(0, 8)} />
       </LandingSection>
     </Layout>

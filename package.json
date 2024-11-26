@@ -1,6 +1,8 @@
 {
   "name": "komi-kura",
   "type": "module",
+  "exports": "./backend/index.ts",
+  "packageManager": "pnpm@9.12.2",
   "scripts": {
     "dev:backend": "tsx watch backend/index.ts",
     "dev:frontend": "vite build --watch",
@@ -22,13 +24,15 @@
     "jsdom": "^25.0.1"
   },
   "devDependencies": {
+    "@hono/vite-build": "^1.1.0",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^20.11.17",
     "concurrently": "^9.1.0",
+    "pkgroll": "^2.5.1",
     "sass": "^1.80.6",
     "tsx": "^4.7.1",
+    "typescript": "^5.7.2",
     "vite": "^5.4.10",
     "vite-plugin-static-copy": "^2.0.0"
-  },
-  "packageManager": "pnpm@9.12.2"
+  }
 }

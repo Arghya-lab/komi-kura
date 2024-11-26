@@ -101,12 +101,7 @@ async function InfoPage({ mangaId }: { mangaId: string }) {
           </div>
         </div>
       </div>
-      <div class="info-container">
-        {/* <OverviewSection mangaInfo={mangaInfo} /> */}
-        {/* <CharactersSection mangaInfo={mangaInfo} /> */}
-        {/* <RecommendationsSection mangaInfo={mangaInfo} /> */}
-        {/* <ChaptersSection mangaInfo={mangaInfo} /> */}
-      </div>
+      <div class="info-container"></div>
 
       <script
         dangerouslySetInnerHTML={{

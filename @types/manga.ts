@@ -1,4 +1,5 @@
 import "@consumet/extensions";
+import type { ITitle } from "@consumet/extensions";
 
 export type IMangaProviderType =
   | "mangadex"
@@ -11,8 +12,10 @@ export type IMangaProviderType =
 
 export interface IMiniMangaItem {
   id: string;
-  title: string;
-  coverImage: string;
+  name: string | [lang: string][] | ITitle;
+  imgSrc?: string;
+  chapterCount?: number;
+  rating?: number;
 }
 
 export type ILandingMangaCategory = "trending" | "popular" | "top-100";

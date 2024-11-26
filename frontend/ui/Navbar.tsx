@@ -35,9 +35,27 @@ function Navbar() {
             class="search-input"
             value=""
           />
-          {/* <span class="clear-icon"></span> */}
+          <button type="button" class="clear-button" aria-label="Clear search">
+            <span class="clear-icon icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-x"
+              >
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+              </svg>
+            </span>
+          </button>
           <button type="submit" class="search-button">
-            <span class="search-icon">
+            <span class="search-icon icon">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -57,6 +75,8 @@ function Navbar() {
           </button>
         </form>
       </header>
+
+      <script type="module" src="/assets/scripts/navbar.js"></script>
     </>
   );
 }

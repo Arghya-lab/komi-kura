@@ -1,3 +1,5 @@
+@import "utils";
+
 .header-wrap {
   padding: 0 1rem 1rem;
 
@@ -22,6 +24,7 @@
   }
 
   .header {
+    @include font-roboto(500);
     border-radius: var(--radius);
     background: hsl(var(--card));
     min-height: 250px;
