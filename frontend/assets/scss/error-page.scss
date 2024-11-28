@@ -1,0 +1,36 @@
+@import "utils";
+
+.error-container {
+  text-align: center;
+  padding: 1rem;
+  padding-top: 48px;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+
+  .logo-container {
+    @include font-roboto(bold);
+    width: 100%;
+    padding-bottom: 24px;
+    display: flex;
+    justify-content: center;
+
+    .logo {
+      width: 192px;
+      max-width: 66%;
+    }
+  }
+
+  p {
+    color: hsl(var(--destructive));
+    font-size: 1.25rem;
+    padding-bottom: 20px;
+  }
+
+  a {
+    color: hsl(var(--muted-foreground));
+
+    &:hover {
+      color: hsl(var(--muted-foreground) / 0.8);
+    }
+  }
+}

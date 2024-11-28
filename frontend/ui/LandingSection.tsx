@@ -11,7 +11,7 @@ function LandingSection({
 }) {
   return (
     <>
-      <link rel="stylesheet" href="/assets/styles/landing-section.css" />
+      <link rel="stylesheet" href="/public/styles/landing-section.css" />
       <div class="landing-section">
         <div class="landing-heading">
           <h3 class={classNames("title", { "bg-font": showViewAll })}>

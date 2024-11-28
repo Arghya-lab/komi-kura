@@ -1,0 +1,65 @@
+@import "utils";
+
+.not-found-container {
+  padding: 1rem;
+  padding-top: 24px;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  max-width: 640px;
+  margin: auto;
+
+  .logo-container {
+    @include font-roboto(bold);
+    width: 100%;
+    padding-bottom: 64px;
+    display: flex;
+    justify-content: center;
+
+    .logo {
+      width: 192px;
+      max-width: 90%;
+    }
+  }
+
+  .contents {
+    .heading {
+      @include font-roboto(bold);
+      color: hsl(var(--primary-foreground));
+      font-size: 1.28rem;
+    }
+
+    .info {
+      // text-align: center;
+      padding-bottom: 1.5rem;
+    }
+
+    .link-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+
+      .triangle-logo {
+        width: 16px;
+        height: 16px;
+
+        svg {
+          rotate: 90deg;
+        }
+      }
+
+      .home-link {
+        font-weight: bold;
+
+        a {
+          @include font-roboto(bold);
+          color: hsl(var(--muted-foreground));
+
+          &:hover {
+            color: hsl(var(--muted-foreground) / 0.8);
+          }
+        }
+      }
+    }
+  }
+}

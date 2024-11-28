@@ -23,6 +23,7 @@
   }
 
   .chapter-container {
+    padding-bottom: 36px;
     display: grid;
     gap: 16px;
     grid-template-columns: repeat(1, 1fr);
@@ -59,48 +60,6 @@
       p {
         font-size: 0.92rem;
         padding-bottom: 8px;
-      }
-    }
-  }
-
-  .pagination-container {
-    width: fit-content;
-    padding-top: 36px;
-    margin: auto;
-
-    .pagination-list {
-      list-style: none;
-      display: flex;
-      gap: 4px;
-
-      li {
-        font-size: 0.875rem;
-        line-height: 1.25rem;
-        height: 36px;
-        width: 36px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 5px;
-      }
-
-      .non-current {
-        cursor: pointer;
-        &:hover {
-          background: hsl(var(--muted));
-        }
-      }
-
-      .current {
-        border: 2px solid hsl(var(--border));
-      }
-
-      .previous,
-      .next {
-        width: auto;
-        padding: 0 10px;
-        text-transform: capitalize;
-        gap: 4px;
       }
     }
   }

@@ -16,7 +16,7 @@ function OverviewSection({ mangaInfo }: { mangaInfo: IMangaInfo }) {
 
   return (
     <>
-      <link rel="stylesheet" href="/assets/styles/overview-section.css" />
+      <link rel="stylesheet" href="/public/styles/overview-section.css" />
       <section class="overview">
         <h3 class="heading">overview</h3>
         {mangaInfo.altTitles && (

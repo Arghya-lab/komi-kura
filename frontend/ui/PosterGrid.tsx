@@ -5,8 +5,8 @@ import MangaPoster from "./MangaPoster.js";
 function PosterGrid({ mangaList }: { mangaList: IMiniMangaItem[] }) {
   return (
     <>
-      <link rel="stylesheet" href="/assets/styles/poster-grid.css" />
-      <link rel="stylesheet" href="/assets/styles/manga-poster.css" />
+      <link rel="stylesheet" href="/public/styles/poster-grid.css" />
+      <link rel="stylesheet" href="/public/styles/manga-poster.css" />
       <div class="grid-items">
         {mangaList.map((manga) => (
           <MangaPoster

@@ -1,59 +1,277 @@
-#page-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-  padding-bottom: 2rem;
+@import "utils";
 
-  .page-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 800px;
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
+.main-container {
+  background: hsl(var(--background));
+  position: relative;
+
+  #page-container {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    gap: 1rem;
+    width: 100%;
+    overflow-y: scroll;
+    height: calc(100vh - 1.5rem - 3rem);
+    padding-bottom: 2rem;
+    user-select: none; /* Standard syntax */
+    -webkit-user-select: none; /* For Safari */
+    -moz-user-select: none; /* For Firefox */
+    -ms-user-select: none; /* For Internet Explorer/Edge */
 
-    &.loading-failed {
-      background-color: hsl(var(--destructive) / 0.5);
-      aspect-ratio: 2 / 3;
+    &.single-image-mode {
+      padding: 0 16px 16px;
+      overflow-y: auto;
+      justify-content: center;
+
+      .page-wrapper {
+        width: auto;
+
+        &.loading {
+          max-width: 100%;
+          max-height: 100%;
+        }
+
+        &.loading-failed {
+          width: 100%;
+        }
+      }
     }
 
-    &.loading {
-      aspect-ratio: 2 / 3;
-      background: linear-gradient(
-        90deg,
-        hsl(var(--muted)) 25%,
-        hsl(var(--background)) 50%,
-        hsl(var(--muted)) 75%
-      );
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      color: hsl(var(--muted-foreground));
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-
-    img {
-      display: none;
+    .page-wrapper {
+      position: relative;
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      max-width: 800px;
+      background-color: hsl(var(--card));
+      border: 1px solid hsl(var(--border));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.loading-failed {
+        background-color: hsl(var(--destructive) / 0.5);
+        aspect-ratio: 2 / 3;
+      }
+
+      &.loading {
+        aspect-ratio: 2 / 3;
+        background: linear-gradient(
+          90deg,
+          hsl(var(--muted)) 25%,
+          hsl(var(--background)) 50%,
+          hsl(var(--muted)) 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        color: hsl(var(--muted-foreground));
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      img {
+        display: none;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .page-number {
+        position: absolute;
+        bottom: 0.5rem;
+        right: 0.5rem;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: hsl(var(--popover-foreground));
+        padding: 0.2rem 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 4px;
+        pointer-events: none;
+      }
+    }
+  }
+
+  .menu-overlay {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: 50;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    pointer-events: none;
+    flex-direction: column;
+    justify-content: flex-end;
+    display: none;
+
+    &.visible {
+      display: flex;
     }
 
-    .page-number {
-      position: absolute;
-      bottom: 0.5rem;
-      right: 0.5rem;
-      background-color: hsl(var(--popover));
-      color: hsl(var(--popover-foreground));
-      padding: 0.2rem 0.5rem;
-      font-size: 0.8rem;
-      border-radius: 4px;
-      pointer-events: none;
+    .bottom-bar {
+      background: hsl(var(--card));
+      pointer-events: auto;
+      padding: 20px 20px 16px;
+
+      .title-bar {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        @include font-roboto(400);
+        font-size: 1.125rem;
+
+        .title {
+        }
+
+        .loading-title {
+          height: 22px;
+          width: 80px;
+          border-radius: 5px;
+          background-color: hsl(var(--accent));
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .page-no {
+          color: hsl(var(--muted-foreground));
+        }
+
+        .loading-page-no {
+          height: 22px;
+          width: 64px;
+          border-radius: 5px;
+          background-color: hsl(var(--accent));
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+      }
+
+      .action-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 10px;
+        @media (max-width: 640px) {
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .select-wrapper {
+          width: 50%;
+          max-width: 350px;
+          border: 2px solid hsl(var(--border));
+          border-radius: var(--radius);
+          padding-right: 16px;
+          margin-right: 64px;
+          @media (max-width: 640px) {
+            margin-right: 0px;
+            width: 72%;
+            padding-right: 12px;
+          }
+
+          .chapter-select {
+            cursor: pointer;
+            border: none;
+            color: hsl(var(--foreground));
+            background: transparent;
+            width: 100%;
+            height: auto;
+            padding: 16px;
+            cursor: pointer;
+            @media (max-width: 640px) {
+              padding: 12px;
+            }
+
+            option {
+              padding: 6px;
+              font-size: 1.125rem;
+              color: hsl(var(--foreground));
+              background: hsl(var(--muted));
+
+              &:hover {
+                background-color: hsl(var(--popover) / 0.85);
+                color: hsl(var(--foreground) / 0.85);
+              }
+
+              &.selected {
+                color: hsl(var(--primary));
+                background: hsl(var(--popover));
+              }
+            }
+          }
+        }
+
+        .page-setting-wrapper {
+          display: flex;
+          gap: 16px;
+
+          .setting-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: hsl(var(--foreground));
+            text-transform: capitalize;
+            width: 65px;
+            border-radius: var(--radius);
+
+            @media (max-width: 640px) {
+              height: 48;
+              width: 48;
+            }
+
+            .loading {
+              height: 76px;
+              width: 65px;
+              border-radius: 5px;
+              background-color: hsl(var(--accent));
+              animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+
+            svg,
+            span {
+            }
+          }
+
+          .two-pages-container {
+            .two-page-logo-wrapper {
+              display: flex;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .btn-container {
+    position: absolute;
+    z-index: 5;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+
+    button {
+      height: 100%;
+      width: 32%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &.flicker-green {
+        animation: flicker-green 1500ms ease-in-out 3;
+      }
+      &.flicker-red {
+        animation: flicker-red 1500ms ease-in-out 3;
+      }
+      &.flicker-yellow {
+        animation: flicker-yellow 1500ms ease-in-out 3;
+      }
+
+      .flicker-text {
+        font-size: 1.125rem;
+        text-transform: capitalize;
+        color: rgb(229, 229, 229);
+        @include font-roboto(bold);
+      }
     }
   }
 }
@@ -64,5 +282,39 @@
   }
   100% {
     background-position: 200% 0;
+  }
+}
+
+@keyframes flicker-green {
+  0%,
+  50%,
+  100% {
+    background-color: rgb(0, 255, 255, 0.1);
+  }
+  30%,
+  70% {
+    background-color: rgb(0, 255, 255, 0.5);
+  }
+}
+
+@keyframes flicker-red {
+  0%,
+  100% {
+    background-color: rgb(255, 0, 0, 0.1);
+  }
+  50% {
+    background-color: rgb(255, 0, 0, 0.5);
+  }
+}
+
+@keyframes flicker-yellow {
+  0%,
+  50%,
+  100% {
+    background-color: rgb(255, 215, 0, 0.1);
+  }
+  30%,
+  70% {
+    background-color: rgb(255, 215, 0, 0.5);
   }
 }

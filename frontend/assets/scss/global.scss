@@ -59,9 +59,16 @@
 body {
   height: 100%;
   width: 100%;
+  position: relative;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   @include font-nunito(500);
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
 }
 
 /***   Scrollbar    ***/

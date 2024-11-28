@@ -15,7 +15,7 @@ function CharactersSection({ mangaInfo }: { mangaInfo: IMangaInfo }) {
 
   return (
     <>
-      <link rel="stylesheet" href="/assets/styles/characters-section.css" />
+      <link rel="stylesheet" href="/public/styles/characters-section.css" />
       <section class="characters">
         <h3 class="heading">characters</h3>
 

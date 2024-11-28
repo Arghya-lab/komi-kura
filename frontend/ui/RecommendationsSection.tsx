@@ -23,9 +23,9 @@ function RecommendationsSection({ mangaInfo }: { mangaInfo: IMangaInfo }) {
     <>
       <link
         rel="stylesheet"
-        href="/assets/styles/recommendations-section.css"
+        href="/public/styles/recommendations-section.css"
       />
-      <link rel="stylesheet" href="/assets/styles/manga-poster.css" />
+      <link rel="stylesheet" href="/public/styles/manga-poster.css" />
       <section class="recommendations">
         <h3 class="heading">recommendations</h3>
 

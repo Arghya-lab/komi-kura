@@ -91,7 +91,7 @@ interface IMangaInfo {
 
 export interface MangaChapterType {
   id: string;
-  title: string;
+  title?: string;
   chapter?: string;
   volume?: number;
   pages?: number;

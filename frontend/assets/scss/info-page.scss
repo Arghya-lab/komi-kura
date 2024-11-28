@@ -131,11 +131,9 @@
           margin: 0;
         }
         .add {
-          border: none;
           border-radius: var(--radius);
           background: hsl(var(--primary));
           align-items: center;
-          cursor: pointer;
           display: flex;
           height: 35px;
           justify-content: center;
@@ -148,11 +146,9 @@
         }
 
         .favourite {
-          border: none;
           align-items: center;
           background: hsl(var(--primary));
           border-radius: var(--radius);
-          cursor: pointer;
           height: 35px;
           padding-left: 1px;
           padding: 8px;
@@ -211,13 +207,10 @@
           padding: 8px 12px;
           width: 100%;
           font-size: 1rem;
-          background-color: transparent;
-          border: none;
           border-radius: 5px;
           text-transform: capitalize;
           color: hsl(var(--secondary-foreground));
           background-color: hsl(var(--muted));
-          cursor: pointer;
 
           &:hover {
             color: hsl(var(--secondary-foreground) / 0.9);

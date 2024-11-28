@@ -1,20 +1,23 @@
 import { getMangaInfo } from "../../backend/services/FetchManga.js";
-import { Layout } from "../ui/Layout.js";
+import Layout from "../ui/Layout.js";
 import Navbar from "../ui/Navbar.js";
 import createDOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
 import OverviewSection from "../ui/OverviewSection.js";
-// import { mangaInfoDemo } from "../../mangaInfoDemo.js";
 import convertDescriptionToString from "../../lib/convertDescriptionToString.js";
 import convertTitleToString from "../../lib/convertTitleToString.js";
 import classNames from "classnames";
 import CharactersSection from "../ui/CharactersSection.js";
 import RecommendationsSection from "../ui/RecommendationsSection.js";
 import ChaptersSection from "../ui/ChaptersSection.js";
+import isErrorInFetching from "../../lib/isErrorInFetching.js";
+import ErrorPage from "./ErrorPage.js";
 
 async function InfoPage({ mangaId }: { mangaId: string }) {
   const mangaInfo = await getMangaInfo(mangaId);
-  // const mangaInfo = mangaInfoDemo;
+
+  if (isErrorInFetching(mangaInfo))
+    return <ErrorPage message={mangaInfo.error} />;
 
   const window = new JSDOM("").window;
   const DOMPurify = createDOMPurify(window);
@@ -33,7 +36,7 @@ async function InfoPage({ mangaId }: { mangaId: string }) {
 
   return (
     <Layout>
-      <link rel="stylesheet" href="/assets/styles/info-page.css" />
+      <link rel="stylesheet" href="/public/styles/info-page.css" />
       <Navbar />
       <div class="header-wrap">
         {mangaInfo.cover && (
@@ -106,15 +109,17 @@ async function InfoPage({ mangaId }: { mangaId: string }) {
       <script
         dangerouslySetInnerHTML={{
           __html: `window.mangaInfo = ${JSON.stringify({
+            mangaId,
             overview: overviewString,
             characters: charactersString,
             recommendations: recommendationsString,
             chapters: chaptersString,
             mangaChaptersData: mangaInfo.chapters,
-          })};`,
+          })};
+          window.mangaInfoJson = ${JSON.stringify(mangaInfo)}`,
         }}
       ></script>
-      <script type="module" src="/assets/scripts/info-page.js"></script>
+      <script type="module" src="/public/scripts/info-page2.js"></script>
     </Layout>
   );
 }

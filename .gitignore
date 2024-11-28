@@ -31,3 +31,4 @@ lerna-debug.log*
 public/styles
 public/scripts
 public/static
+public/assets

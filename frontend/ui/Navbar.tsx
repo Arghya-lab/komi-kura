@@ -1,7 +1,7 @@
 function Navbar() {
   return (
     <>
-      <link rel="stylesheet" href="/assets/styles/navbar.css" />
+      <link rel="stylesheet" href="/public/styles/navbar.css" />
       <header class="navbar">
         <a href="/" class="navbar-heading">
           <svg
@@ -76,7 +76,7 @@ function Navbar() {
         </form>
       </header>
 
-      <script type="module" src="/assets/scripts/navbar.js"></script>
+      <script type="module" src="/public/scripts/navbar.js"></script>
     </>
   );
 }

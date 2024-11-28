@@ -19,25 +19,20 @@ function getEntryFiles(dir: string): string[] {
 }
 
 const entryFiles = getEntryFiles("frontend/assets");
-if (entryFiles.length === 0) {
-  console.warn(
-    "Warning: No .ts or .scss files found in the specified directory."
-  );
-}
 
 export default defineConfig({
   plugins: [
     viteStaticCopy({
       targets: [
         {
-          src: "frontend/assets/static/**", // Copy all files
-          dest: "static", // Copy into public/static
+          src: "frontend/assets/static/**",
+          dest: "static",
         },
       ],
     }),
   ],
   build: {
-    outDir: "public", // Set output directory to `public`
+    outDir: "public",
     rollupOptions: {
       input: entryFiles,
       output: {
@@ -48,10 +43,17 @@ export default defineConfig({
         assetFileNames: (asset) => {
           if (asset?.name?.endsWith(".css")) return "styles/[name][extname]";
           if (asset?.name?.endsWith(".js")) return "scripts/[name][extname]";
-          return "assets/[name][extname]";
+          return "public/[name][extname]";
         },
-        // preserveModules: true,
-        // preserveModulesRoot: "frontend/assets",
+        manualChunks(id) {
+          // Organize chunks
+          if (id.includes("node_modules")) {
+            if (id.includes("@tabler/icons-react")) {
+              return "icons";
+            }
+            return "vendor";
+          }
+        },
       },
     },
     minify: true,
@@ -60,7 +62,6 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         api: "modern-compiler",
-        // additionalData: `@import "frontend/assets/scss/variables.scss";`,
       },
     },
   },

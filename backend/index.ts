@@ -5,6 +5,7 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { rateLimiter } from "hono-rate-limiter";
 import apiRoute from "./routes/api.routes.js";
 import frontendRoute from "./routes/frontend.routes.js";
+import notfoundRoute from "./routes/notfound.routes.js";
 
 const app = new Hono();
 
@@ -21,16 +22,17 @@ app.use(
 );
 
 app.use(
-  "/assets/*",
+  "/public/*",
   serveStatic({
     root: "./",
-    rewriteRequestPath: (path) => path.replace(/^\/assets/, "/public"),
+    rewriteRequestPath: (path) => path.replace(/^\/public/, "/public"),
   })
 );
 
 //  Routes  //
 app.route("/", frontendRoute);
 app.route("/api", apiRoute);
+app.route("/", notfoundRoute);
 
 //  Serve  //
 const port = 3000;

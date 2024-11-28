@@ -8,11 +8,11 @@ function ChaptersSection({ mangaInfo }: { mangaInfo: IMangaInfo }) {
 
   return (
     <>
-      <link rel="stylesheet" href="/assets/styles/chapters-section.css" />
+      <link rel="stylesheet" href="/public/styles/chapters-section.css" />
+      <link rel="stylesheet" href="/public/styles/pagination.css" />
       <section class="chapters">
         <h3 class="heading">chapters</h3>
         <div class="chapter-container"></div>
-        <div class="pagination-container"></div>
       </section>
     </>
   );
