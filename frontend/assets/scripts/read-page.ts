@@ -1,8 +1,11 @@
 import convertTitleToString from "../../../lib/convertTitleToString.js";
 import formatTitleFromId from "../../../lib/formatTitleFromId.js";
+import getNextPrevChapterPageLink from "../../../lib/getNextPrevChapterPageLink.js";
+import getPrevNextChapter from "../../../lib/getPrevNextCurrChapter.js";
+import isErrorInFetching from "../../../lib/isErrorInFetching.js";
 import isTouchDevice from "../../../lib/isTouchDevice.js";
 import type { MangaChapterPageType } from "./main.js";
-import type { IMangaInfo } from "@consumet/extensions";
+import type { IMangaChapter, IMangaInfo } from "@consumet/extensions";
 
 const mainContainer = document.querySelector(
   ".main-container"
@@ -27,13 +30,16 @@ const chapterId = window.chapterId;
 const mangaId = window.mangaId;
 let mangaInfo: IMangaInfo | null = null;
 let isMangaInfoFetching = true;
+let isErrorFetchingMangaInfo = false;
 let loadedImages = new Set<number>();
-const imageCache = new Map<string, HTMLImageElement>();
+const pageImgCache = new Map<string, HTMLImageElement>();
 let isLoadingImage = false;
 let loadingQueue: number[] = [];
 let currentReadingPage: number | null = null;
 let isSingleImageMode: boolean = false;
 let isFullScreen: boolean = false;
+let sendToPrevNextChapter: "prev" | "next" | null = null;
+let chaptersReadTill: { [key: string]: number } = {}; // here key is mangaId + "_" + chapterId and value is lastReadPage
 
 const fetchMangaInfo = async (mangaId: string) => {
   try {
@@ -43,13 +49,22 @@ const fetchMangaInfo = async (mangaId: string) => {
       throw new Error("Network response was not ok");
     }
 
-    const data = (await response.json()) as IMangaInfo;
-    mangaInfo = data;
-    isMangaInfoFetching = false;
-    localStorage.setItem("mangaInfo", JSON.stringify(data));
+    const data = (await response.json()) as
+      | IMangaInfo
+      | {
+          error: string;
+        };
+    if (isErrorInFetching(data)) {
+      isErrorFetchingMangaInfo = true;
+    } else {
+      mangaInfo = data;
+      isMangaInfoFetching = false;
+      localStorage.setItem("mangaInfo", JSON.stringify(data));
 
-    loadChaptersForSelect();
-    refreshBottomBarTitle();
+      appendNextPrevChapterLinks();
+      loadChaptersForSelect();
+      refreshBottomBarTitle();
+    }
   } catch (error) {
     console.error("Error fetching manga info:", error);
   }
@@ -64,11 +79,11 @@ async function loadPrevNextImagesSequentially(currentPage: number) {
     await new Promise<void>((resolve) => {
       const imgSrc = pages[pageNo - 1].img;
 
-      if (!imageCache.has(imgSrc)) {
+      if (!pageImgCache.has(imgSrc)) {
         const img = new Image();
         img.src = imgSrc;
         img.onload = () => {
-          imageCache.set(imgSrc, img);
+          pageImgCache.set(imgSrc, img);
           resolve();
         };
       }
@@ -77,19 +92,23 @@ async function loadPrevNextImagesSequentially(currentPage: number) {
   }
 }
 
-const navigateImage = (direction: number) => {
-  currentReadingPage = currentReadingPage || 1;
-  const nextPage = currentReadingPage - 1 + direction;
-
-  if (nextPage >= 0 && nextPage < pages.length) {
-    currentReadingPage = nextPage + 1;
-
-    createWrapper(currentReadingPage);
-    loadAndInsertImage(pages[currentReadingPage - 1].img, currentReadingPage);
-    loadPrevNextImagesSequentially(currentReadingPage);
-
-    refreshBottomBarTitle();
+const navigateImage = (pageNo: number) => {
+  if (sendToPrevNextChapter === "prev") {
+    currentReadingPage = pageNo - 1;
+    sendToPrevNextChapter = null;
+  } else if (sendToPrevNextChapter === "next") {
+    currentReadingPage = pageNo + 1;
+    sendToPrevNextChapter = null;
+  } else {
+    currentReadingPage = pageNo;
   }
+
+  createWrapper(currentReadingPage);
+  loadAndInsertImage(pages[currentReadingPage - 1].img, currentReadingPage);
+  loadPrevNextImagesSequentially(currentReadingPage);
+  refreshBottomBarTitle();
+
+  saveChaptersReadTill();
 };
 
 const createWrapper = (pageNo: number, isScrollingMode = false) => {
@@ -130,15 +149,17 @@ const loadAndInsertImage = async (
       return;
     }
 
-    if (imageCache.has(url)) {
-      const cachedImg = imageCache.get(url)!;
+    if (pageImgCache.has(url)) {
+      const cachedImg = pageImgCache.get(url)!;
 
-      // Append the cached image
-      wrapper.appendChild(cachedImg);
       wrapper.classList.remove("loading");
-      cachedImg.style.display = "block"; // Ensure the image is visible
+      cachedImg.style.display = "block";
+
+      // Ensure no duplicate images are appended
+      if (!wrapper.querySelector("img")) {
+        wrapper.appendChild(cachedImg);
+      }
       resolve();
-      return;
     }
 
     const img = new Image();
@@ -147,7 +168,7 @@ const loadAndInsertImage = async (
     img.onload = () => {
       wrapper.classList.remove("loading");
       img.style.display = "block";
-      imageCache.set(url, img);
+      pageImgCache.set(url, img);
 
       // Ensure no duplicate images are appended
       if (!wrapper.querySelector("img")) {
@@ -198,6 +219,7 @@ const observeImages = (pages: MangaChapterPageType[]) => {
           if (!loadedImages.has(pageNo) && !loadingQueue.includes(pageNo)) {
             loadingQueue = [pageNo];
             currentReadingPage = pageNo;
+            saveChaptersReadTill();
             refreshBottomBarTitle();
 
             const prevPage = loadingQueue[0] - 1;
@@ -241,6 +263,14 @@ const showLoading = () => {
   bottomBarTitleContainer.innerHTML = `<div class="loading-title"></div><div class="loading-page-no"></div>`;
   pageViewSettingBtn.innerHTML = `<div class="loading"></div>`;
   fullscreenBtn.innerHTML = `<div class="loading"></div>`;
+  // if (!isSingleImageMode) {
+  //   const chapterNavContainer = document.createElement("div");
+  //   chapterNavContainer.className = "chapter-nav-container loading";
+  //   pageContainer.innerHTML = "<p></p>";
+  //   pageContainer.prepend(chapterNavContainer.cloneNode(true)); // Clone the container for separate placement
+  //   pageContainer.append(chapterNavContainer);
+  // }
+
   //add more
 };
 
@@ -271,26 +301,117 @@ const loadChaptersForSelect = () => {
   });
 };
 
+const appendPageNaveBtns = () => {
+  const btnContainer = document.createElement("div");
+  btnContainer.className = "btn-container";
+
+  btnContainer.innerHTML = `
+  <button class="left-btn"></button>
+  ${isTouchDevice() ? '<button class="center-btn"></button>' : ""}
+  <button class="right-btn"></button>
+  `;
+  mainContainer.appendChild(btnContainer);
+};
+
+const createPageChapterWrapper = (previousOrNext: "previous" | "next") => {
+  if (!mangaInfo?.chapters || !chapterId || !currentReadingPage) return;
+
+  const PrevNextChapter = getPrevNextChapter(mangaInfo.chapters, chapterId);
+  if (!PrevNextChapter) return;
+
+  const { prevChapter, nextChapter, currChapter } = PrevNextChapter;
+  if (!currChapter) return;
+
+  const targetChapter =
+    previousOrNext === "previous" ? prevChapter : nextChapter;
+  if (!targetChapter) return;
+
+  const createChapterHTML = (
+    status: string,
+    chapter: IMangaChapter
+  ): string => `
+    <div>
+      <p class="chapter-status">${status}</p>
+      <div class="chapter-name">
+        <p>${formatTitleFromId(chapter.id)}</p>
+        <p>${chapter.title}</p>
+      </div>
+    </div>`;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "page-wrapper chapter-page-wrapper";
+  wrapper.innerHTML = `
+    <div class="${previousOrNext}">
+      ${createChapterHTML(previousOrNext, targetChapter)}
+      ${createChapterHTML("current", currChapter)}
+    </div>
+  `;
+
+  const pageContainerAspectRatio =
+    pageContainer.offsetWidth / pageContainer.offsetHeight;
+  if (pageContainerAspectRatio > 2 / 3) {
+    wrapper.style.height = "100%";
+  } else {
+    wrapper.style.width = "100%";
+  }
+
+  sendToPrevNextChapter = previousOrNext === "previous" ? "prev" : "next";
+
+  pageContainer.innerHTML = wrapper.outerHTML;
+};
+
 const listenForPageNavigate = () => {
   const btnContainer = document.querySelector(
     ".btn-container"
   ) as HTMLDivElement;
 
-  btnContainer.addEventListener("click", (event) => {
-    if ((event.target as HTMLElement).tagName === "BUTTON") {
+  const handleBtnContainerClick = (event: MouseEvent) => {
+    if (
+      (event.target as HTMLElement).tagName === "BUTTON" &&
+      currentReadingPage
+    ) {
       if ((event.target as HTMLElement).classList.contains("left-btn")) {
-        navigateImage(1);
-      } else if (
-        (event.target as HTMLElement).classList.contains("right-btn")
-      ) {
-        navigateImage(-1);
-      } else if (
-        (event.target as HTMLElement).classList.contains("center-btn")
-      ) {
-        menuOverlay.classList.toggle("visible");
+        if (sendToPrevNextChapter === "next") {
+          const nextChapterLink = getNextPrevChapterPageLink(
+            mangaInfo?.chapters,
+            chapterId,
+            mangaId
+          ).nextChapterPageLink;
+          if (nextChapterLink) window.location.href = nextChapterLink;
+        }
+
+        if (currentReadingPage < pages.length) {
+          navigateImage(currentReadingPage + 1);
+        } else if (currentReadingPage === pages.length) {
+          createPageChapterWrapper("next");
+        }
+      }
+
+      if ((event.target as HTMLElement).classList.contains("right-btn")) {
+        if (sendToPrevNextChapter === "prev") {
+          const prevChapterLink = getNextPrevChapterPageLink(
+            mangaInfo?.chapters,
+            chapterId,
+            mangaId
+          ).prevChapterPageLink;
+
+          if (prevChapterLink) window.location.href = prevChapterLink;
+        }
+
+        if (currentReadingPage > 1) {
+          navigateImage(currentReadingPage - 1);
+        } else if (currentReadingPage === 1) {
+          createPageChapterWrapper("previous");
+        }
       }
     }
-  });
+
+    if ((event.target as HTMLElement).classList.contains("center-btn")) {
+      menuOverlay.classList.toggle("visible");
+    }
+  };
+
+  btnContainer.addEventListener("click", handleBtnContainerClick);
 };
 
 function addFlicker(
@@ -332,6 +453,28 @@ const generateFlickerOnBtn = () => {
   }
 };
 
+const appendNextPrevChapterLinks = () => {
+  if (!mangaInfo || !mangaInfo.chapters || !chapterId || !mangaId) return;
+
+  const { prevChapterPageLink, nextChapterPageLink } =
+    getNextPrevChapterPageLink(mangaInfo.chapters, chapterId, mangaId);
+
+  const chapterNavContainer = document.createElement("div");
+  chapterNavContainer.className = "chapter-nav-container";
+
+  if (prevChapterPageLink) {
+    chapterNavContainer.innerHTML += `<a class="chapter-nav-link" href="${prevChapterPageLink}"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg><span>previous chapter</span></a>`;
+  }
+  if (nextChapterPageLink) {
+    chapterNavContainer.innerHTML += `<a class="chapter-nav-link" href="${nextChapterPageLink}"><span>next chapter</span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 6l6 6l-6 6" /></svg></a>`;
+  }
+
+  if (chapterNavContainer.innerHTML) {
+    pageContainer.prepend(chapterNavContainer.cloneNode(true)); // Clone the container for separate placement
+    pageContainer.append(chapterNavContainer);
+  }
+};
+
 const updateViewMode = () => {
   if (isSingleImageMode) {
     pageContainer.classList.add("single-image-mode");
@@ -341,23 +484,20 @@ const updateViewMode = () => {
     createWrapper(currentReadingPage);
     loadAndInsertImage(pages[currentReadingPage - 1].img, currentReadingPage);
 
-    //create left, right, center btn
-    const btnContainer = document.createElement("div");
-    btnContainer.className = "btn-container";
-    btnContainer.innerHTML = `
-    <button class="left-btn"></button>
-    ${isTouchDevice() ? '<button class="center-btn"></button>' : ""}
-    <button class="right-btn"></button>
-    `;
-    mainContainer.appendChild(btnContainer);
-
+    appendPageNaveBtns();
     listenForPageNavigate();
     generateFlickerOnBtn();
   } else {
+    const btnContainer = document.querySelector(
+      ".btn-container"
+    ) as HTMLDivElement | null;
+    btnContainer?.remove();
     pageContainer.classList.remove("single-image-mode");
     pageContainer.innerHTML = "";
+
     pages.forEach((page) => createWrapper(page.page, true));
     observeImages(pages);
+    appendNextPrevChapterLinks();
 
     // scroll to currently reading page
     document
@@ -368,10 +508,10 @@ const updateViewMode = () => {
 
 const revaluatePageViewLogo = () => {
   if (isSingleImageMode) {
+    pageViewSettingBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gallery-horizontal"><path d="M2 3v18" /><rect width="12" height="18" x="6" y="3" rx="2" /><path d="M22 3v18" /></svg><span class="text-info">scroll</span>`;
+  } else {
     pageViewSettingBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rectangle-vertical"><rect width="12" height="20" x="6" y="2" rx="2" /></svg>
     <span class="text-info">1 page</span>`;
-  } else {
-    pageViewSettingBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gallery-horizontal"><path d="M2 3v18" /><rect width="12" height="18" x="6" y="3" rx="2" /><path d="M22 3v18" /></svg><span class="text-info">scroll</span>`;
   }
 };
 
@@ -392,6 +532,28 @@ const loadBottomBar = () => {
   revaluateFullScreenLogo();
 };
 
+const saveChaptersReadTill = () => {
+  if (mangaId && chapterId && currentReadingPage) {
+    const key = `${mangaId}_${chapterId}`;
+
+    const chaptersReadTill: { [key: string]: number } = JSON.parse(
+      localStorage.getItem("chaptersReadTill") || "{}"
+    );
+    chaptersReadTill[key] = currentReadingPage;
+
+    localStorage.setItem("chaptersReadTill", JSON.stringify(chaptersReadTill));
+  }
+};
+
+const setLastReadTill = () => {
+  const prevChaptersReadTill: { [key: string]: number } = JSON.parse(
+    localStorage.getItem("chaptersReadTill") || "{}"
+  );
+
+  const key = `${mangaId}_${chapterId}`;
+  currentReadingPage = prevChaptersReadTill[key] || 1;
+};
+
 const init = () => {
   mangaInfo = JSON.parse(
     localStorage.getItem("mangaInfo") || "null"
@@ -410,6 +572,7 @@ const init = () => {
     loadBottomBar();
   }
 
+  setLastReadTill();
   updateViewMode();
 };
 
@@ -431,8 +594,8 @@ pageViewSettingBtn.addEventListener("click", () => {
 fullscreenBtn.addEventListener("click", () => {
   if (isFullScreen) {
     document?.exitFullscreen();
-    (document as any).webkitExitFullscreen(); // Safari
-    (document as any).msExitFullscreen(); // IE/Edge
+    (document as any)?.webkitExitFullscreen(); // Safari
+    (document as any)?.msExitFullscreen(); // IE/Edge
   } else {
     mainContainer?.requestFullscreen();
     (mainContainer as any)?.webkitRequestFullscreen(); // Safari
@@ -446,8 +609,10 @@ document.addEventListener("fullscreenchange", () => {
     document.fullscreenElement === mainContainer
   ) {
     isFullScreen = true;
+    pageContainer.classList.add("fullscreen");
   } else {
     isFullScreen = false;
+    pageContainer.classList.remove("fullscreen");
   }
 
   revaluateFullScreenLogo();

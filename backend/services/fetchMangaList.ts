@@ -5,7 +5,32 @@ import type {
   IMiniMangaItem,
 } from "../../@types/manga.js";
 
+let savedFetchMangaList: {
+  [key in ILandingMangaCategory]?: IMiniMangaItem[];
+} & { savedAt: string } = {
+  popular: [],
+  trending: [],
+  "top-100": [],
+  savedAt: new Date(new Date().getTime() - 25 * 60 * 60 * 1000).toISOString(),
+};
+
+const isMoreThan24HoursOld = (savedDatetime: string) => {
+  const savedDate = new Date(savedDatetime);
+  const currentDate = new Date();
+
+  // Calculate the difference in milliseconds
+  const differenceInMilliseconds = currentDate.getTime() - savedDate.getTime();
+
+  // Check if the difference is more than 24 hours (in milliseconds)
+  const twentyFourHoursInMilliseconds = 24 * 60 * 60 * 1000;
+  return differenceInMilliseconds > twentyFourHoursInMilliseconds;
+};
+
 export default async function fetchMangaList(type: ILandingMangaCategory) {
+  if (!isMoreThan24HoursOld(savedFetchMangaList.savedAt)) {
+    return savedFetchMangaList[type];
+  }
+
   try {
     const url = `https://anilist.co/search/manga/${type}`;
     const { data } = await axios.get(url);
@@ -27,6 +52,10 @@ export default async function fetchMangaList(type: ILandingMangaCategory) {
         });
       }
     });
+
+    // Update the saved data and timestamp
+    savedFetchMangaList[type] = mangaList;
+    savedFetchMangaList.savedAt = new Date().toISOString();
 
     return mangaList;
   } catch {

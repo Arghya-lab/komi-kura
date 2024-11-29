@@ -10,7 +10,7 @@
     align-items: center;
     gap: 1rem;
     width: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: calc(100vh - 1.5rem - 3rem);
     padding-bottom: 2rem;
     user-select: none; /* Standard syntax */
@@ -23,16 +23,27 @@
       overflow-y: auto;
       justify-content: center;
 
+      &.fullscreen {
+        padding-bottom: 0px;
+        height: 100vh;
+
+        .page-wrapper {
+          max-height: 100%;
+          height: auto;
+        }
+      }
+
       .page-wrapper {
         width: auto;
+        max-width: none;
 
         &.loading {
           max-width: 100%;
           max-height: 100%;
         }
 
-        &.loading-failed {
-          width: 100%;
+        img {
+          object-fit: scale-down;
         }
       }
     }
@@ -67,6 +78,35 @@
         font-weight: bold;
       }
 
+      &.chapter-page-wrapper {
+        aspect-ratio: 2/3;
+
+        .previous,
+        .next {
+          padding: 32px;
+          width: 100%;
+          height: 100%;
+          max-width: 640px;
+          max-height: 384px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+
+          div {
+            .chapter-status {
+              text-transform: capitalize;
+              font-size: 1.125rem;
+              color: hsl(var(--foreground) / 0.8);
+            }
+
+            .chapter-name {
+              font-size: 1.28rem;
+              padding-top: 6px;
+            }
+          }
+        }
+      }
+
       img {
         display: none;
         width: 100%;
@@ -84,6 +124,35 @@
         font-size: 0.8rem;
         border-radius: 4px;
         pointer-events: none;
+      }
+    }
+
+    .chapter-nav-container {
+      margin-top: 12px;
+      text-transform: capitalize;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+
+      &.loading {
+        height: 36px;
+        width: 288px;
+        border-radius: 5px;
+        background: hsl(var(--accent));
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+
+      .chapter-nav-link {
+        background: hsl(var(--accent));
+        padding: 8px 10px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+
+        &:hover {
+          background: hsl(var(--accent) / 0.8);
+        }
       }
     }
   }

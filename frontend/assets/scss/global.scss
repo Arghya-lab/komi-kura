@@ -71,6 +71,11 @@ button {
   background-color: transparent;
 }
 
+a {
+  color: hsl(var(--foreground));
+  text-decoration: none;
+}
+
 /***   Scrollbar    ***/
 /* Scrollbar color and width for Firefox */
 html {
